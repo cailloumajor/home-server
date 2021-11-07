@@ -1,0 +1,44 @@
+[api]
+insecure = true
+
+[certificatesResolvers.letsencrypt.acme]
+# Let's Encrypy staging server, comment out in production !
+caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+email = "${ACME_EMAIL}"
+storage = "/letsencrypt/acme.json"
+
+[certificatesResolvers.letsencrypt.acme.dnsChallenge]
+provider = "${DNSCHALLENGE_PROVIDER}"
+
+[entryPoints.web]
+address = ":80"
+
+[entryPoints.web.http.redirections.entryPoint]
+to = "websecure"
+
+[entryPoints.websecure]
+address = ":443"
+
+[entryPoints.websecure.http.tls]
+certResolver = "letsencrypt"
+
+[[entryPoints.websecure.http.tls.domains]]
+main = "${DOMAIN_NAME}"
+sans = [ "*.${DOMAIN_NAME}" ]
+
+[global]
+checkNewVersion = false
+sendAnonymousUsage = true
+
+[log]
+level = "INFO"
+
+[pilot]
+token = "301b7e91-0a86-4d9e-a655-c8a34f90a23a"
+
+[ping]
+
+[providers.docker]
+defaultRule = "Host(`{{ index .Labels \"io.balena.service-name\" }}.${DOMAIN_NAME}`)"
+endpoint = "${DOCKER_HOST}"
+exposedByDefault = false
